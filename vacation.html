@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="전입 날짜와 전역 날짜를 입력하여 손쉽게 해군과 공군의 총 휴가 기간을 계산해보세요!" />
+    <meta name="keywords" content="해군, 공군, 휴가, 계산기, 전입 날짜, 종료 날짜" />
+    <meta name="author" content="ssazibang-navy" />
+    <meta property="og:title" content="해군/공군 휴가 계산기 - 총 휴가 일수 계산" />
+    <meta property="og:description" content="전입 날짜와 전역 날짜를 입력하여 손쉽게 해군과 공군의 총 휴가 기간을 계산해보세요!" />
+    <meta property="og:image" content="https://ssazibang-navy.github.io/vacation.png" />
+    <meta property="og:url" content="https://ssazibang-navy.github.io/vacation.html" />
+    <link rel="canonical" href="https://ssazibang-navy.github.io/vacation.html" />
+    <title>해군/공군 휴가 계산기 - 총 휴가 일수 계산</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      input {
+        margin: 5px 0;
+      }
+    </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "해군/공군 휴가 계산기",
+      "description": "전입 날짜와 전역 날짜를 입력하여 손쉽게 해군과 공군의 총 휴가 기간을 계산해보세요.",
+      "url": "https://ssazibang-navy.github.io/vacation.html",
+      "applicationCategory": "Utility"
+    }
+    </script>
+  </head>
+  <body>
+    <h1>해군/공군 휴가 계산기</h1>
+    <p>전입 날짜와 전역 날짜를 입력한 후 총 휴가 일수를 입력하면, 예상되는 휴가 날짜를 자동으로 계산하여 보여줍니다.</p>
+    <label for="startDate"><strong>전입 또는 시작 날짜:</strong></label>
+    <input type="date" id="startDate" onchange="calculate()" required />
+    <br />
+    <label for="endDate"><strong>전역 또는 종료 날짜:</strong></label>
+    <input type="date" id="endDate" onchange="calculate()" required />
+    <br />
+    <label for="vacationDays"><strong>총 휴가 일수:</strong></label>
+    <input type="number" id="vacationDays" onchange="calculate()" required />
+    <br />
+    <p style="color: #777">(C) 2025 SSAZIBANG-NAVY</p>
+    <hr />
+    <h2>계산된 휴가 날짜</h2>
+    <ul id="holidayList"></ul>
+    <script>
+      function calculate() {
+        const startDate = new Date(document.getElementById("startDate").value);
+        const endDate = new Date(document.getElementById("endDate").value);
+        const vacationDays = parseInt(document.getElementById("vacationDays").value);
+        const days = ["일", "월", "화", "수", "목", "금", "토"];
+        const holidayList = document.getElementById("holidayList");
+        holidayList.innerHTML = "";
+
+        if (isNaN(startDate) || isNaN(endDate) || startDate >= endDate || isNaN(vacationDays)) {
+          return;
+        }
+
+        let currentHolidayStart = new Date(startDate);
+        currentHolidayStart.setDate(currentHolidayStart.getDate() + 42);
+
+        while (currentHolidayStart <= endDate) {
+          const currentHolidayEnd = new Date(currentHolidayStart);
+          currentHolidayEnd.setDate(currentHolidayEnd.getDate() + vacationDays - 1);
+
+          const listItem = document.createElement("li");
+          listItem.textContent = `${currentHolidayStart.toLocaleDateString()} (${days[currentHolidayStart.getDay()]}) ~ ${currentHolidayEnd.toLocaleDateString()} (${days[currentHolidayEnd.getDay()]})`;
+          holidayList.appendChild(listItem);
+
+          currentHolidayStart.setDate(currentHolidayStart.getDate() + (42 + vacationDays));
+        }
+      }
+    </script>
+  </body>
+</html>
