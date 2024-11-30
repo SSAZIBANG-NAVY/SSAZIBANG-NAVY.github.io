@@ -17,8 +17,32 @@
         font-family: Arial, sans-serif;
         margin: 20px;
       }
+  
       input {
         margin: 5px 0;
+      }
+  
+      .calendar {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        grid-gap: 5px;
+        margin-top: 20px;
+      }
+  
+      .calendar div {
+        text-align: center;
+        padding: 10px;
+        border: 1px solid #ddd;
+        font-size: 14px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+  
+      .calendar .holiday {
+        background-color: #0098ff;
+        color: white;
       }
     </style>
     <script type="application/ld+json">
@@ -46,34 +70,90 @@
     <br />
     <p style="color: #777">(C) 2025 SSAZIBANG-NAVY</p>
     <hr />
-    <h2>계산된 휴가 날짜</h2>
-    <ul id="holidayList"></ul>
+    <div id="calendarContainer"></div>
     <script>
       function calculate() {
         const startDate = new Date(document.getElementById("startDate").value);
         const endDate = new Date(document.getElementById("endDate").value);
         const vacationDays = parseInt(document.getElementById("vacationDays").value);
-        const days = ["일", "월", "화", "수", "목", "금", "토"];
-        const holidayList = document.getElementById("holidayList");
-        holidayList.innerHTML = "";
-
+    
         if (isNaN(startDate) || isNaN(endDate) || startDate >= endDate || isNaN(vacationDays)) {
           return;
         }
-
+    
+        const calendarContainer = document.getElementById("calendarContainer");
+        calendarContainer.innerHTML = "";
+    
         let currentHolidayStart = new Date(startDate);
-        currentHolidayStart.setDate(currentHolidayStart.getDate() + 42);
-
+        currentHolidayStart.setDate(currentHolidayStart.getDate());
+    
+        // 각 휴가 기간에 대해 달력 생성
         while (currentHolidayStart <= endDate) {
           const currentHolidayEnd = new Date(currentHolidayStart);
           currentHolidayEnd.setDate(currentHolidayEnd.getDate() + vacationDays - 1);
-
-          const listItem = document.createElement("li");
-          listItem.textContent = `${currentHolidayStart.toLocaleDateString()} (${days[currentHolidayStart.getDay()]}) ~ ${currentHolidayEnd.toLocaleDateString()} (${days[currentHolidayEnd.getDay()]})`;
-          holidayList.appendChild(listItem);
-
+    
+          // 각 휴가 기간에 대한 달력 그리기
+          const holidayCalendar = document.createElement("div");
+          holidayCalendar.classList.add("holiday-calendar");
+          const holidayTitle = document.createElement("h3");
+          holidayTitle.textContent = `휴가 기간: ${currentHolidayStart.toLocaleDateString()} ~ ${currentHolidayEnd.toLocaleDateString()}`;
+          holidayCalendar.appendChild(holidayTitle);
+    
+          // 해당 휴가 기간의 달력 생성
+          createCalendar(holidayCalendar, currentHolidayStart, currentHolidayEnd);
+          calendarContainer.appendChild(holidayCalendar);
+    
+          // 다음 휴가 기간으로 이동 (휴가 기간 + 42일 후)
           currentHolidayStart.setDate(currentHolidayStart.getDate() + (42 + vacationDays));
         }
+      }
+    
+      function createCalendar(container, holidayStart, holidayEnd) {
+        const year = holidayStart.getFullYear();
+        const month = holidayStart.getMonth();
+    
+        const firstDayOfMonth = new Date(year, month, 1);
+        const lastDayOfMonth = new Date(year, month + 1, 0);
+    
+        // 달력 그리기
+        const calendarGrid = document.createElement("div");
+        calendarGrid.classList.add("calendar");
+    
+        // 요일 헤더 추가
+        const header = ["일", "월", "화", "수", "목", "금", "토"];
+        header.forEach(day => {
+          const dayElement = document.createElement("div");
+          dayElement.textContent = day;
+          calendarGrid.appendChild(dayElement);
+        });
+    
+        // 첫 번째 날짜 전의 빈 공간을 채우기
+        for (let i = 0; i < firstDayOfMonth.getDay(); i++) {
+          const emptyDay = document.createElement("div");
+          calendarGrid.appendChild(emptyDay);
+        }
+    
+        // 해당 월의 날짜들 추가
+        const totalDays = lastDayOfMonth.getDate();
+        for (let i = 1; i <= totalDays; i++) {
+          const currentDay = new Date(year, month, i);
+          const dayElement = document.createElement("div");
+          dayElement.textContent = i;
+    
+          // 휴가 날짜 강조
+          if (isHoliday(currentDay, holidayStart, holidayEnd)) {
+            dayElement.classList.add("holiday");
+          }
+    
+          calendarGrid.appendChild(dayElement);
+        }
+    
+        container.appendChild(calendarGrid);
+      }
+    
+      function isHoliday(date, holidayStart, holidayEnd) {
+        // 휴가 기간 내 날짜인지 확인
+        return date >= holidayStart && date <= holidayEnd;
       }
     </script>
   </body>
