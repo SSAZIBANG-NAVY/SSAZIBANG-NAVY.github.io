@@ -152,8 +152,8 @@
       }
     
       function isHoliday(date, holidayStart, holidayEnd) {
-        // 휴가 기간 내 날짜인지 확인
-        return date >= holidayStart && date <= holidayEnd;
+        const formatDate = (d) => parseInt(d.toLocaleDateString("ko-KR", {day: 'numeric'}));
+        return formatDate(date) >= formatDate(holidayStart) && formatDate(date) <= formatDate(holidayEnd);
       }
     </script>
   </body>
